@@ -1,0 +1,22 @@
+Package: gpmss
+Title: Gaussian Process Models for Social Science
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "JBrandon",
+           family = "Duck-Mayr",
+           role = c("aut", "cre"),
+           email = "j.duckmayr@gmail.com",
+           comment = c(ORCID = "0000-0002-2231-1294"))
+Description: While there are various Gaussian process (GP) model implementations
+    available, the extension packages written for R do not usually offer tools
+    for hyperparameter tuning and/or do not provide a single consistent
+    interface for the types of models useful for social scientists (akin to the
+    general purpose 'GPML' software for MATLAB). Moreover, no existing
+    implementation provides convenient tools for quantities of interest to
+    social scientists, such as average marginal effects of predictors. 'gpmss'
+    provides this functionality.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
