@@ -3,3 +3,6 @@
 export(CovSEard)
 export(CovSEiso)
 export(CovarianceFunction)
+export(MeanFunction)
+export(MeanLinear)
+export(MeanZero)

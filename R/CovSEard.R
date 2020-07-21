@@ -166,7 +166,7 @@ CovSEard <- R6::R6Class(
 
         ## Constructor
         #' @description
-        #' Create a new CovSEiso object
+        #' Create a new CovSEard object
         #' @param hypers A numeric vector giving hyperparameters for the
         #'     covariance function; a vector of length two giving the log of
         #'     the scale factor and the log of the length scale, in that order

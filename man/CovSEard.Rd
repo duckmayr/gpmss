@@ -171,7 +171,7 @@ partial (order = 2); the default is 1}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new CovSEiso object
+Create a new CovSEard object
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{CovSEard$new(hypers = numeric())}\if{html}{\out{</div>}}
 }
