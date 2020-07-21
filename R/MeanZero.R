@@ -33,7 +33,7 @@ MeanZero <- R6::R6Class(
         #' @description
         #' Compute partial derivatives of mean function with respect to
         #' its hyperparameters
-        #' @param X The nput values (should be a numeric matrix)
+        #' @param X The input values (should be a numeric matrix)
         #' @param hypers A numeric vector giving hyperparameters for the
         #'     mean function. If NULL (the default), the hypers data
         #'     member is used.

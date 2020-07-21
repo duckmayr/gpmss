@@ -74,7 +74,7 @@ its hyperparameters
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
-\item{\code{X}}{The nput values (should be a numeric matrix)}
+\item{\code{X}}{The input values (should be a numeric matrix)}
 
 \item{\code{hypers}}{A numeric vector giving hyperparameters for the
 mean function. If NULL (the default), the hypers data

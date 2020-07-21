@@ -10,7 +10,7 @@
 #' @details
 #' The anisometric squared exponential covariance function has D + 1
 #' hyperparameters (where D is the number of dimensions in X),
-#' \eqn{\sigma_f}, the scale factor, and \eqn{\boldsymbol\ell},
+#' \eqn{\sigma_f}, the scale factor, and \eqn{\boldsymbol\ell}{ell},
 #' a vector of characteristic length scales.
 #' The scale factor governs (on average) how far from the mean the function
 #' values can be, while the length scales govern how quickly the
@@ -23,7 +23,8 @@
 #' dimensions, particularly for dichotomous dimensions of X
 #' (hence the moniker "automatic relevance determination").
 #'
-#' The covariance between \eqn{f(\mathbf{x}_i)} and \eqn{f(\mathbf{x}_j)}
+#' The covariance between \eqn{f(\mathbf{x}_i)}{f(x_i)}
+#' and \eqn{f(\mathbf{x}_j)}{f(x_j)}
 #' is given by
 #'
 #' \deqn{
@@ -34,9 +35,12 @@
 #'         \left( \mathbf{x}_i - \mathbf{x}_j \right)^T
 #'         M \left( \mathbf{x}_i - \mathbf{x}_j \right)
 #'     \right),
+#' }{%
+#'     k ( x_i, x_j ) = \sigma_f^2 exp [ ( x_i - x_j )^T M ( x_i - x_j ) ],
 #' }
 #'
-#' where \eqn{M} is a matrix whose dth diagonal entry is \eqn{1 / \ell_d^2}.
+#' where \eqn{M} is a matrix whose dth diagonal entry is
+#' \eqn{1 / \ell_d^2}{1 / ell_d^2}.
 #'
 #' @section Warning:
 #' Note that the hyperparameters should be stored on the log scale;

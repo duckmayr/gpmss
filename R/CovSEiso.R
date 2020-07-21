@@ -8,14 +8,15 @@
 #'
 #' @details
 #' The isometric squared exponential covariance function has two
-#' hyperparameters, \eqn{\sigma_f}, the scale factor, and \eqn{\ell},
+#' hyperparameters, \eqn{\sigma_f}, the scale factor, and \eqn{\ell}{ell},
 #' the characteristic length scale. The scale factor governs (on average)
 #' how far from the mean function values can be, while the length scale governs
 #' how quickly the function can change; or, in other words, as the function
 #' output covariance is given as a function of distance in the covariate space,
 #' the length scale governs what "closeness" means.
 #'
-#' The covariance between \eqn{f(\mathbf{x}_i)} and \eqn{f(\mathbf{x}_j)}
+#' The covariance between \eqn{f(\mathbf{x}_i)}{f(x_i)}
+#' and \eqn{f(\mathbf{x}_j)}{f(x_j)}
 #' is given by
 #'
 #' \deqn{
@@ -26,9 +27,12 @@
 #'         \left( \mathbf{x}_i - \mathbf{x}_j \right)^T
 #'         M \left( \mathbf{x}_i - \mathbf{x}_j \right)
 #'     \right),
+#' }{%
+#'     k ( x_i, x_j ) = \sigma_f^2 exp [ ( x_i - x_j )^T M ( x_i - x_j ) ],
 #' }
 #'
-#' where \eqn{M} is a matrix whose diagonal entries are \eqn{1 / \ell^2}.
+#' where \eqn{M} is a matrix whose diagonal entries are
+#' \eqn{1 / \ell^2}{1 / ell^2}.
 #'
 #' @section Warning:
 #' Note that the hyperparameters should be stored on the log scale;
