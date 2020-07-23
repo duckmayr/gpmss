@@ -74,6 +74,10 @@ CovSEard <- R6::R6Class(
         cov = function(X, Z = X, hypers = NULL) {
             if ( is.null(hypers) ) {
                 hypers <- self$hypers
+                if ( length(hypers) == 2 ) {
+                    hypers <- c(hypers[1], rep(hypers[2], ncol(X)))
+                    self$hypers <- hypers
+                }
             }
             if ( length(hypers) != (ncol(X)+1) ) {
                 stop("CovSEiso should be called with D+1 hyperparameters.")
@@ -109,6 +113,10 @@ CovSEard <- R6::R6Class(
         parameter_derivative = function(X, Z = X, hypers = NULL, param = 1) {
             if ( is.null(hypers) ) {
                 hypers <- self$hypers
+                if ( length(hypers) == 2 ) {
+                    hypers <- c(hypers[1], rep(hypers[2], ncol(X)))
+                    self$hypers <- hypers
+                }
             }
             D  <- ncol(X)
             if ( length(hypers) != (D+1) ) {
@@ -144,6 +152,10 @@ CovSEard <- R6::R6Class(
                                     dimension = 1, order = 1) {
             if ( is.null(hypers) ) {
                 hypers <- self$hypers
+                if ( length(hypers) == 2 ) {
+                    hypers <- c(hypers[1], rep(hypers[2], ncol(X)))
+                    self$hypers <- hypers
+                }
             }
             if ( length(hypers) != (ncol(X)+1) ) {
                 stop("CovSEard should be called with D+1 hyperparameters.")
@@ -172,9 +184,12 @@ CovSEard <- R6::R6Class(
         #' @description
         #' Create a new CovSEard object
         #' @param hypers A numeric vector giving hyperparameters for the
-        #'     covariance function; a vector of length two giving the log of
-        #'     the scale factor and the log of the length scale, in that order
-        initialize = function(hypers = numeric()) {
+        #'     covariance function; a vector of length D+1 giving the log of
+        #'     the scale factor and the log of the length scale, in that order.
+        #'     If the provided hypers are of length two instead, the second
+        #'     element will be recycled as necessary to match the number of
+        #'     columns of X when used.
+        initialize = function(hypers = c(0, 0)) {
             self$hypers = hypers
         }
     )

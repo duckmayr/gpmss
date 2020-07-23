@@ -60,12 +60,12 @@ LikGauss <- R6::R6Class(
 
         ## Constructor
         #' @description
-        #' Create a new LikelihoodFunction object
+        #' Create a new LikGauss object
         #' @param hypers A numeric vector giving hyperparameters for the
         #'     likelihood function; a numeric vector of length one giving
         #'     the (log of) the standard deviation of the normal distribution
         #'     for the likelihood
-        initialize = function(hypers = numeric()) {
+        initialize = function(hypers = 0) {
             self$hypers = hypers
         }
     )

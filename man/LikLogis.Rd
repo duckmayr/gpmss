@@ -36,13 +36,13 @@ hyperparameters}
 \itemize{
 \item \href{#method-lp}{\code{LikLogis$lp()}}
 \item \href{#method-f_derivative}{\code{LikLogis$f_derivative()}}
-\item \href{#method-new}{\code{LikLogis$new()}}
 \item \href{#method-clone}{\code{LikLogis$clone()}}
 }
 }
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="gpmss" data-topic="LikelihoodFunction" data-id="initialize">}\href{../../gpmss/html/LikelihoodFunction.html#method-initialize}{\code{gpmss::LikelihoodFunction$initialize()}}\out{</span>}
 }
 \out{</details>}
 }
@@ -92,26 +92,6 @@ member is used.}
 
 \item{\code{order}}{An integer vector of length one giving order of
 derivative desired; the default is 1}
-}
-\if{html}{\out{</div>}}
-}
-}
-\if{html}{\out{<hr>}}
-\if{html}{\out{<a id="method-new"></a>}}
-\if{latex}{\out{\hypertarget{method-new}{}}}
-\subsection{Method \code{new()}}{
-Create a new LikelihoodFunction object
-\subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LikLogis$new(hypers = numeric())}\if{html}{\out{</div>}}
-}
-
-\subsection{Arguments}{
-\if{html}{\out{<div class="arguments">}}
-\describe{
-\item{\code{hypers}}{A numeric vector giving hyperparameters for the
-likelihood function; a numeric vector of length one giving
-the (log of) the standard deviation of the normal distribution
-for the likelihood}
 }
 \if{html}{\out{</div>}}
 }

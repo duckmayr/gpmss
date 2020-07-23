@@ -168,7 +168,7 @@ partial (order = 2); the default is 1}
 \subsection{Method \code{new()}}{
 Create a new CovSEiso object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CovSEiso$new(hypers = numeric())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CovSEiso$new(hypers = c(0, 0))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{

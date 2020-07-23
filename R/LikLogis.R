@@ -75,17 +75,6 @@ LikLogis <- R6::R6Class(
                 stop("Derivatives of the log of the logistic likelihood ",
                      "function are provided only up to order 3.")
             }
-        },
-
-        ## Constructor
-        #' @description
-        #' Create a new LikelihoodFunction object
-        #' @param hypers A numeric vector giving hyperparameters for the
-        #'     likelihood function; a numeric vector of length one giving
-        #'     the (log of) the standard deviation of the normal distribution
-        #'     for the likelihood
-        initialize = function(hypers = numeric()) {
-            self$hypers = hypers
         }
     )
 )

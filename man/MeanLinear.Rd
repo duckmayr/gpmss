@@ -7,8 +7,21 @@
 A linear mean.
 }
 \details{
-This function gives a linear mean; denoting its hyper vector by \eqn{\beta},
-for an input matrix \eqn{X}, the prior mean is \eqn{X \beta}.
+This function gives a linear mean; denoting its hyper vector by
+\eqn{(\alpha, \beta)}, where \eqn{\alpha} is an (optional) intercept,
+and \eqn{\beta} is a vector of coefficients whose length is the same
+as the number of columns in \eqn{X}, then for an input matrix \eqn{X},
+the prior mean is \eqn{\alpha + X \beta}.
+
+Note: Usually in regression models we would instead use the notation
+\eqn{X \beta}, where the first element of \eqn{\beta} is a coefficient
+for the intercept and \eqn{X} has a column of ones prepended to it.
+The reason we do not do this in GP regression and classification is
+because adding a one column to the design matrix is generally not
+desirable in terms of the inputs to the kernel, and is not generally
+helpful for other mean functions as well. So, we simply address the
+intercept issue by adding a hyperparameter to a linear mean function
+that is not involved with any multiplication with predictors.
 }
 \section{Super class}{
 \code{\link[gpmss:MeanFunction]{gpmss::MeanFunction}} -> \code{MeanLinear}
@@ -21,6 +34,9 @@ function's name; "linear"}
 
 \item{\code{hypers}}{A numeric vector giving the mean function's
 hyperparameters}
+
+\item{\code{intercept}}{A logical vector of length one; does the linear
+mean include an intercept?}
 }
 \if{html}{\out{</div>}}
 }
@@ -119,14 +135,19 @@ default is 1}
 \subsection{Method \code{new()}}{
 Create a new MeanLinear object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{MeanLinear$new(hypers = numeric())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{MeanLinear$new(hypers = 0, intercept = TRUE)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{hypers}}{A numeric vector giving hyperparameters for
-the mean function.}
+the mean function. If the provided hypers are of length one,
+it will be recycled as necessary to match the number of columns
+of X when used.}
+
+\item{\code{intercept}}{A logical vector of length one; should the linear
+mean include an intercept? The default is TRUE.}
 }
 \if{html}{\out{</div>}}
 }

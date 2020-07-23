@@ -5,7 +5,8 @@
 \title{Likelihood Function Class}
 \description{
 This provides a parent class for all likelihood function classes for gpmss.
-
+}
+\details{
 We implement the following likelihood functions:
 \describe{
 \item{LikGauss}{The likelihood of \eqn{y_i} given \eqn{f_i} is normal
@@ -36,8 +37,13 @@ Its arguments should be the same as the \code{lp()} method,
 with one additional argument, \code{order},
 giving the order of derivative desired.
 
-Its constructor should take one mandatory argument, \code{hypers},
+Its constructor should take at least one argument, \code{hypers},
 which will be stored as the data member \code{hypers}.
+This should have a sane default, as many users may pass the class generator
+to the constructor for a \code{\link{GPModel}} without explicitly
+specifying hyperparameters. This should not cause much difficulty if the
+user optimizes the hyperparameters, but a sane default should be provided
+nonetheless.
 The data member \code{hypers} should be a public member so that it can be
 accessed and modified directly.
 

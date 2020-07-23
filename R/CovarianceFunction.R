@@ -4,6 +4,7 @@
 #' @description
 #' This provides a parent class for all covariance function classes for gpmss.
 #'
+#' @details
 #' "A Gaussian process is completely specified by its mean function and
 #' covariance function" (Rasmussen and Williams 2006, 13). The covariance
 #' function gives the prior covariance between function outputs given two
@@ -52,8 +53,13 @@
 #' an integer vector of length one giving the order of partial derivative
 #' desired.
 #'
-#' Its constructor should take one mandatory argument, \code{hypers},
+#' Its constructor should take at least one argument, \code{hypers},
 #' which will be stored as the data member \code{hypers}.
+#' This should have a sane default, as many users may pass the class generator
+#' to the constructor for a \code{\link{GPModel}} without explicitly
+#' specifying hyperparameters. This should not cause much difficulty if the
+#' user optimizes the hyperparameters, but a sane default should be provided
+#' nonetheless.
 #' The data member \code{hypers} should be a public member so that it can be
 #' accessed and modified directly.
 #'

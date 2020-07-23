@@ -4,6 +4,7 @@
 #' @description
 #' This provides a parent class for all mean function classes for gpmss.
 #'
+#' @details
 #' "A Gaussian process is completely specified by its mean function and
 #' covariance function" (Rasmussen and Williams 2006, 13). The mean
 #' function gives the prior mean for function output given input values.
@@ -12,9 +13,9 @@
 #' \describe{
 #'     \item{MeanZero}{A zero mean; for any set of inputs, the GP's prior
 #'         mean is zero.}
-#'     \item{MeanLinear}{A linear mean; denoting its hyper vector by
-#'         \eqn{\beta}, for an input matrix \eqn{X}, the prior mean is
-#'         \eqn{X \beta}.}
+#'     \item{MeanLinear}{A linear mean; the GP's prior mean is a vector of
+#'         coefficients multiplied by the predictors, plus (optionally) an
+#'         intercept.}
 #' }
 #'
 #' Users may also define their own mean functions for use with gpmss
@@ -44,8 +45,13 @@
 #' \code{dimension}, an integer vector of length one giving the dimension of X
 #' with respect to which the derivative is being taken.
 #'
-#' Its constructor should take one mandatory argument, \code{hypers},
+#' Its constructor should take at least one argument, \code{hypers},
 #' which will be stored as the data member \code{hypers}.
+#' This should have a sane default, as many users may pass the class generator
+#' to the constructor for a \code{\link{GPModel}} without explicitly
+#' specifying hyperparameters. This should not cause much difficulty if the
+#' user optimizes the hyperparameters, but a sane default should be provided
+#' nonetheless.
 #' The data member \code{hypers} should be a public member so that it can be
 #' accessed and modified directly.
 #'

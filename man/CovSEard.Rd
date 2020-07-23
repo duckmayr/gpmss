@@ -177,15 +177,18 @@ partial (order = 2); the default is 1}
 \subsection{Method \code{new()}}{
 Create a new CovSEard object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CovSEard$new(hypers = numeric())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CovSEard$new(hypers = c(0, 0))}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
 \if{html}{\out{<div class="arguments">}}
 \describe{
 \item{\code{hypers}}{A numeric vector giving hyperparameters for the
-covariance function; a vector of length two giving the log of
-the scale factor and the log of the length scale, in that order}
+covariance function; a vector of length D+1 giving the log of
+the scale factor and the log of the length scale, in that order.
+If the provided hypers are of length two instead, the second
+element will be recycled as necessary to match the number of
+columns of X when used.}
 }
 \if{html}{\out{</div>}}
 }

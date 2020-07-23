@@ -169,7 +169,7 @@ CovSEiso <- R6::R6Class(
         #' @param hypers A numeric vector giving hyperparameters for the
         #'     covariance function; a vector of length two giving the log of the
         #'     scale factor and the log of the length scale, in that order
-        initialize = function(hypers = numeric()) {
+        initialize = function(hypers = c(0, 0)) {
             self$hypers = hypers
         }
     )

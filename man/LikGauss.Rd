@@ -103,9 +103,9 @@ derivative desired; the default is 1}
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
-Create a new LikelihoodFunction object
+Create a new LikGauss object
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{LikGauss$new(hypers = numeric())}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{LikGauss$new(hypers = 0)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
