@@ -296,7 +296,6 @@ GPModel <- R6::R6Class(
             if ( optimize ) {
                 warning("Hyper optimization not yet implemented.")
             }
-            self$train(...)
         },
         ## Methods
         #' Train the GP model, providing a characterization of the posterior

@@ -3,6 +3,7 @@
 export(CovSEard)
 export(CovSEiso)
 export(CovarianceFunction)
+export(GPCLA)
 export(GPModel)
 export(GPR)
 export(LikGauss)

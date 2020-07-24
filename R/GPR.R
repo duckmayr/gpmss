@@ -109,8 +109,6 @@ GPR <- R6::R6Class(
     public = list(
         ## Data members
         #' @field y The outcomes; should be a numeric vector.
-        #'     Depending on the model there may be further restrictions
-        #'     on the nature of the data.
         #'     This field is usually generated automatically during object
         #'     construction and does not generally need to be interacted
         #'     with directly by the user.
@@ -212,8 +210,7 @@ GPR <- R6::R6Class(
         #' @param force_all_levs A logical vector of length one; if \code{TRUE},
         #'     unused factor levels in right-hand side variables are
         #'     \strong{not} dropped. The default is \code{FALSE}.
-        #' @param ... Other arguments specific to a particular model;
-        #'     see the help file for specific models for more details.
+        #' @param ... Other arguments specific to a particular model; unused.
         initialize = function(formula, data,          ## data specification
                               likfun = LikGauss,      ## likelihood function
                               meanfun = MeanZero,     ## prior mean function
@@ -239,6 +236,7 @@ GPR <- R6::R6Class(
                 super$initialize(formula, data, likfun, meanfun, covfun,
                                  optimize, force_all_levs)
             }
+            self$train()
         },
         ## Methods
         #' Train the GP model, providing a characterization of the posterior
@@ -402,7 +400,6 @@ GPR <- R6::R6Class(
             bnames  <- setdiff(bnames, fnames)
             bnames  <- union(bnames, names(differences))
             cnames  <- setdiff(vnames, c(fnames, bnames))
-            ## We will refer to X a lot, so
             ## Length variables
             n  <- nrow(self$X)
             m  <- length(variables)

@@ -83,7 +83,7 @@ CovSEard <- R6::R6Class(
                 stop("CovSEiso should be called with D+1 hyperparameters.")
             }
             s <- exp(2 * hypers[1])
-            M <- diag(1 / exp(2 * hypers[-1]))
+            M <- diag(1 / exp(2 * hypers[-1]), nrow = length(hypers)-1)
             n <- nrow(X)
             m <- nrow(Z)
             K <- matrix(NA_real_, nrow = n, ncol = m)
