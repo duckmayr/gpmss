@@ -278,31 +278,31 @@ GPCLA <- R6::R6Class(
             f  <- m                                 ## Start f at prior mean
             alpha <- rep(0, n)                      ## \nabla log p(y | f)
             o0 <- Inf                               ## Old objective fun eval
-            o1 <- Psi(0, alpha, 0, K, m, y)         ## Current obj fun eval
+            o1 <- Psi(0, alpha, 0, K, m, self$y)    ## Current obj fun eval
             i  <- 0                                 ## Iterations completed
             while ( abs(o1-o0) > 1e-6 & i < 20 ) {  ## Start Newton
                 i  <- i  + 1                        ## Update iters completed
                 o0 <- o1                            ## Store old obj fun val
                 p  <- exp(self$likfun$lp(j, f))     ## Pred probs (MAP)
-                W  <- diag(-self$likfun$f_derivative(y, f, order = 2))
+                W  <- diag(-self$likfun$f_derivative(self$y, f, order = 2))
                 sW <- sqrt(W)                       ## Square root of W
                 M  <- sW %*% K                      ## We reuse sW %*% K
                 L  <- t(chol(I + M %*% sW))         ## LL^T = B = I + sW K sW
-                g  <- self$likfun$f_derivative(y,f) ## likelihood gradient
+                g  <- self$likfun$f_derivative(self$y,f) ## likelihood gradient
                 b  <- W %*% (f-m) + g               ## W (f-m) + g
                 a  <- b - sW %*% (L %//% (M %*% b)) ## Regular Newtown step
                 d  <- c(a - alpha)                  ## Diff btw Newton & alpha
-                s  <- step_size(alpha, d, K, m, y)  ## Find optimal step size
+                s  <- step_size(alpha,d,K,m,self$y) ## Find optimal step size
                 alpha <- alpha + s * d              ## Update alpha
-                o1 <- Psi(0, alpha, 0, K, m, y)     ## Update obj fun value
+                o1 <- Psi(0, alpha, 0, K, m,self$y) ## Update obj fun value
                 f  <- c(K %*% alpha + m)            ## Update f
             }                                       ## End Newton
             ## Store quantities of future interest
             self$L <- L
             self$alpha <- alpha
-            self$sW <- sqrt(diag(-self$likfun$f_derivative(y, f, order = 2)))
+            self$sW <- sqrt(diag(-self$likfun$f_derivative(self$y,f,order = 2)))
             self$post_mean <- f
-            v <- solve(L, sW %*% K)
+            v <- solve(self$L, self$sW %*% K)
             self$post_cov  <- K - t(v) %*% v
             self$prior_mean <- m
         },
@@ -321,7 +321,7 @@ GPCLA <- R6::R6Class(
             Kss   <- self$covfun$cov(Xstar)
             Ks    <- self$covfun$cov(Xstar, X)
             fmean <- self$meanfun$mean(Xstar) + Ks %*% self$alpha
-            fcov  <- solve(self$L, sW %*% t(Ks))
+            fcov  <- solve(self$L, self$sW %*% t(Ks))
             fcov  <- Kss - t(fcov) %*% fcov
             return(
                 list(

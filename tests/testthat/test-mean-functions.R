@@ -18,16 +18,21 @@ test_that("MeanZero's input_derivative() method works properly", {
 })
 
 ##### Linear Mean -----
-mu   <- MeanLinear$new()
-beta <- rep(c(1, -1), length.out = ncol(X))
+mu1   <- MeanLinear$new()
+mu2   <- MeanLinear$new(intercept = FALSE)
+alpha <- 1
+beta  <- rep(c(1, -1), length.out = ncol(X))
+hyp   <- c(alpha, beta)
 test_that("MeanLinear's mean() method works properly", {
-    expect_equal(mu$mean(X, beta), X %*% beta)
+    expect_equal(mu1$mean(X, hyp), alpha + X %*% beta)
 })
 test_that("MeanLinear's parameter_derivative() method works properly", {
-    expect_equal(mu$parameter_derivative(X, beta, 1), X[, 1])
-    expect_error(mu$parameter_derivative(X, beta, ncol(X)+1))
+    expect_equal(mu1$parameter_derivative(X, hyp, 1), rep(0, nrow(X)))
+    expect_equal(mu1$parameter_derivative(X, hyp, 2), X[, 1])
+    expect_equal(mu2$parameter_derivative(X, beta, 1), X[, 1])
+    expect_error(mu1$parameter_derivative(X, hyp, ncol(X)+2))
 })
 test_that("MeanLinear's input_derivative() method works properly", {
-    expect_equal(mu$input_derivative(X, beta, 1), rep(beta[1], n))
-    expect_error(mu$input_derivative(X, beta, ncol(X)+1))
+    expect_equal(mu1$input_derivative(X, hyp, 1), rep(beta[1], n))
+    expect_error(mu1$input_derivative(X, hyp, ncol(X)+1))
 })
