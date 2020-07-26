@@ -97,14 +97,21 @@ CovSEiso <- R6::R6Class(
         #'     If 1 (the default), the derivative is taken with respect to the
         #'     (log of the) scale factor; if 2, it is taken with respect to the
         #'     (log of the) length scale.
-        parameter_derivative = function(X, Z = X, hypers = NULL, param = 1) {
+        #' @param K An optional provision of the pre-computed kernel;
+        #'     this is useful if parameter_derivative() will be called
+        #'     repeatedly (for the different hypers) without the kernel
+        #'     itself changing
+        parameter_derivative = function(X, Z = X, hypers = NULL, param = 1,
+                                        K = NULL) {
             if ( is.null(hypers) ) {
                 hypers <- self$hypers
             }
             if ( length(hypers) != 2 ) {
                 stop("CovSEiso should be called with two hyperparameters.")
             }
-            K  <- self$cov(X, Z, hypers)
+            if ( is.null(K) ) {
+                K  <- self$cov(X, Z, hypers)
+            }
             if ( param == 1 ) {
                 return(2 * K) ## partial wrt scale factor
             } else {
@@ -135,15 +142,22 @@ CovSEiso <- R6::R6Class(
         #' @param order An integer vector of length one indicating whether the
         #'     first partial derivative (order = 1) is desired, or the cross
         #'     partial (order = 2); the default is 1
+        #' @param K An optional provision of the pre-computed kernel;
+        #'     this is useful if parameter_derivative() will be called
+        #'     repeatedly (for the different hypers) without the kernel
+        #'     itself changing
         input_derivative = function(X, Z = X, hypers = NULL,
-                                    dimension = 1, order = 1) {
+                                    dimension = 1, order = 1,
+                                    K = NULL) {
             if ( is.null(hypers) ) {
                 hypers <- self$hypers
             }
             if ( length(hypers) != 2 ) {
                 stop("CovSEiso should be called with two hyperparameters.")
             }
-            K  <- self$cov(X, Z, hypers)
+            if ( is.null(K) ) {
+                K  <- self$cov(X, Z, hypers)
+            }
             n  <- nrow(K)
             m  <- ncol(K)
             dK <- matrix(NA_real_, n, m)

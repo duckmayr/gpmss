@@ -250,7 +250,7 @@ GPR <- R6::R6Class(
             m <- self$meanfun$mean(self$X)
             a <- L %//% (self$y - m)
             v <- solve(L, K)
-            V <- K - t(v) %*% v
+            V <- K - crossprod(v)
             self$L <- L
             self$alpha <- a
             self$post_mean <- m + K %*% a
@@ -270,7 +270,7 @@ GPR <- R6::R6Class(
             Ks    <- self$covfun$cov(Xstar, X)
             fmean <- self$meanfun$mean(Xstar) + Ks %*% self$alpha
             fcov  <- solve(self$L, t(Ks))
-            fcov  <- Kss - t(fcov) %*% fcov
+            fcov  <- Kss - crossprod(fcov)
             sy2   <- exp(2 * self$likfun$hypers[1])
             ycov  <- fcov + diag(sy2, nrow = nrow(fcov))
             return(
@@ -296,16 +296,17 @@ GPR <- R6::R6Class(
         #' covariance, and likelihood functions.
         #' @param ... Additional arguments affecting the calculation
         dnlml = function(...) {
-            Q <- self$L %//% diag(length(self$y)) - self$alpha %*% t(self$alpha)
+            K  <- self$covfun$cov(self$X)
+            Q <- self$L %//% diag(length(self$y)) - tcrossprod(self$alpha)
             res <- list()
             res[["mean"]] <- numeric(length(self$meanfun$hypers))
             for ( i in seq_along(res[["mean"]]) ) {
                 d <- self$meanfun$parameter_derivative(self$X, param = i)
-                res[["mean"]][i] <- -t(d) %*% self$alpha
+                res[["mean"]][i] <- -crossprod(d, self$alpha)
             }
             res[["cov"]]  <- numeric(length(self$covfun$hypers))
             for ( i in seq_along(res[["cov"]]) ) {
-                d <- self$covfun$parameter_derivative(self$X, param = i)
+                d <- self$covfun$parameter_derivative(self$X, param = i, K = K)
                 res[["cov"]][i] <- 0.5 * sum(Q * d)
             }
             res[["lik"]]  <- exp(2 * self$likfun$hypers[1]) * sum(diag(Q))
@@ -403,6 +404,8 @@ GPR <- R6::R6Class(
             ## Length variables
             n  <- nrow(self$X)
             m  <- length(variables)
+            ## It will be useful to have the kernel
+            K  <- self$covfun$cov(self$X)
             ## Get effects for each variable
             for ( d in variables ) {
                 x   <- self$X[ , d]
@@ -410,13 +413,14 @@ GPR <- R6::R6Class(
                     ## Do partial derivatives of prior mean and covariance
                     i   <- which(colnames(self$X) == d)
                     md  <- self$meanfun$input_derivative(self$X, dimension = i)
-                    Kd  <- self$covfun$input_derivative(self$X, dimension = i)
+                    Kd  <- self$covfun$input_derivative(self$X, dimension = i,
+                                                        K = K)
                     Kdd <- self$covfun$input_derivative(self$X, dimension = i,
-                                                        order = 2)
+                                                        order = 2, K = K)
                     ## Get mean and variance of derivative of f wrt d
                     E   <- c(md + Kd %*% self$alpha)
                     v   <- solve(self$L, Kd)
-                    V   <- Kdd - t(v) %*% v
+                    V   <- Kdd - crossprod(v)
                     rownames(V) <- colnames(V) <- rownames(self$X)
                 } else if ( d %in% bnames ) { ## if this is a binary variable
                     ## Get mean and variance of f(1) - f(0)
@@ -434,7 +438,7 @@ GPR <- R6::R6Class(
                     fs      <- Ks %*% self$alpha + self$meanfun$mean(Xs)
                     Kss     <- self$covfun$cov(Xs)
                     v       <- solve(self$L, t(Ks))
-                    Kp      <- Kss - t(v) %*% v
+                    Kp      <- Kss - crossprod(v)
                     nn      <- nrow(Xs)
                     i1      <- 1:n
                     i2      <- (n+1):nn
@@ -469,7 +473,7 @@ GPR <- R6::R6Class(
                     Ks      <- self$covfun$cov(Xs, self$X)
                     Kss     <- self$covfun$cov(Xs)
                     v       <- solve(self$L, t(Ks))
-                    Kp      <- Kss - t(v) %*% v
+                    Kp      <- Kss - crossprod(v)
                     ## And the posterior mean
                     fs      <- Ks %*% self$alpha + self$meanfun$mean(Xs)
                     ## And then we can get the mean and covariance of the diff

@@ -263,7 +263,7 @@ GPCLA <- R6::R6Class(
             Psi <- function(step_size, alpha, delta, K, m, y) {
                 a <- alpha + step_size * delta
                 f <- K %*% a + m
-                return(c(0.5 * t(a) %*% (f-m) - sum(plogis(y*f, log.p = TRUE))))
+                return(c(0.5*crossprod(a,f-m)-sum(plogis(y*f, log.p = TRUE))))
             }
             ## Gets the optimal step size
             step_size <- function(alpha, delta, K, m, y) {
@@ -303,7 +303,7 @@ GPCLA <- R6::R6Class(
             self$sW <- sqrt(diag(-self$likfun$f_derivative(self$y,f,order = 2)))
             self$post_mean <- f
             v <- solve(self$L, self$sW %*% K)
-            self$post_cov  <- K - t(v) %*% v
+            self$post_cov  <- K - crossprod(v)
             self$prior_mean <- m
         },
         #' @description
@@ -321,8 +321,8 @@ GPCLA <- R6::R6Class(
             Kss   <- self$covfun$cov(Xstar)
             Ks    <- self$covfun$cov(Xstar, X)
             fmean <- self$meanfun$mean(Xstar) + Ks %*% self$alpha
-            fcov  <- solve(self$L, self$sW %*% t(Ks))
-            fcov  <- Kss - t(fcov) %*% fcov
+            fcov  <- solve(self$L, tcrossprod(self$sW, Ks))
+            fcov  <- Kss - crossprod(fcov)
             return(
                 list(
                     fmean = fmean,
@@ -335,7 +335,7 @@ GPCLA <- R6::R6Class(
         #' @param ... Additional arguments affecting the calculation
         nlml = function(...) {
             fhat <- self$post_mean
-            kern <- c(t(fhat - self$prior_mean) %*% self$alpha)
+            kern <- crossprod(fhat - self$prior_mean, self$alpha)
             ll   <- sum(self$likfun$lp(self$y, fhat)) ## log likelihood
             hldB <- sum(log(diag(self$L)))            ## 1/2 log(det(B))
             return(0.5 * kern + hldB - ll)
@@ -357,6 +357,7 @@ GPCLA <- R6::R6Class(
             ## on to the calculations
             R   <- sW %*% (L %//% sW)      ## = sW (I + sW K sW)^{-1} sW
             K   <- self$covfun$cov(self$X) ## prior covariance
+            KR  <- K %*% R                 ## we reuse this a lot
             dl1 <- self$likfun$f_derivative(self$y, fhat, order = 1)
             dl3 <- self$likfun$f_derivative(self$y, fhat, order = 3)
             C   <- solve(L, sW %*% K) ## a step to df = deriv of nlml wrt f, =
@@ -365,14 +366,14 @@ GPCLA <- R6::R6Class(
             res[["mean"]] <- numeric(length(self$meanfun$hypers))
             for ( i in seq_along(res[["mean"]]) ) {
                 d <- self$meanfun$parameter_derivative(self$X, param = i)
-                res[["mean"]][i] <- -t(a) %*% d - t(df) %*% (d - K %*% (R%*%d))
+                res[["mean"]][i] <- -crossprod(a, d) - crossprod(df, d - KR%*%d)
             }
             res[["cov"]]  <- numeric(length(self$covfun$hypers))
             for ( i in seq_along(res[["cov"]]) ) {
-                d <- self$covfun$parameter_derivative(self$X, param = i) ## dK
-                e <- c((sum(diag(R %*% d)) - t(a) %*% d %*% a) / 2) ## explicit
+                d <- self$covfun$parameter_derivative(self$X, param = i, K = K)
+                e <- c((sum(colSums(t(R) * d)) - crossprod(a, d) %*% a) / 2)
                 b <- d %*% dl1 ## temp calculation
-                res[["cov"]][i] <- e - c(t(df) %*% (b - K %*% R %*% b))
+                res[["cov"]][i] <- e - crossprod(df, (b - KR %*% b))
             }
             ## FIXME: At some point I'll need to implement partial derivatives
             ##        of nlml wrt likelihood hypers, but I'm not worrying about
@@ -496,9 +497,10 @@ GPCLA <- R6::R6Class(
             ## Length variables
             n  <- nrow(self$X)
             m  <- length(variables)
+            ## It will be useful to have the kernel
+            K  <- self$covfun$cov(self$X)
             ## If type == "response", we need the lower Cholesky of K
             if ( type == "response" ) {
-                K  <- self$covfun$cov(self$X)
                 LK <- try(t(chol(K)), silent = TRUE)
                 ## If chol() fails, try regularization
                 if ( inherits(LK, "try-error") ) {
@@ -515,14 +517,16 @@ GPCLA <- R6::R6Class(
                         md  <- self$meanfun$input_derivative(self$X,
                                                              dimension = i)
                         Kd  <- self$covfun$input_derivative(self$X,
-                                                            dimension = i)
+                                                            dimension = i,
+                                                            K = K)
                         Kdd <- self$covfun$input_derivative(self$X,
                                                             dimension = i,
+                                                            K = K,
                                                             order = 2)
                         ## Get mean and variance of derivative of f wrt d
                         E   <- c(md + Kd %*% self$alpha)
                         v   <- solve(self$L, self$sW %*% Kd)
-                        V   <- Kdd - t(v) %*% v
+                        V   <- Kdd - crossprod(v)
                         rownames(V) <- colnames(V) <- rownames(self$X)
                     } else if ( d %in% bnames ) { ## if it's a binary variable
                         ## Get mean and variance of f(1) - f(0)
@@ -539,8 +543,8 @@ GPCLA <- R6::R6Class(
                         Ks      <- self$covfun$cov(Xs, self$X)
                         fs      <- Ks %*% self$alpha + self$meanfun$mean(Xs)
                         Kss     <- self$covfun$cov(Xs)
-                        v       <- solve(self$L, self$sW %*% t(Ks))
-                        Kp      <- Kss - t(v) %*% v
+                        v       <- solve(self$L, tcrossprod(self$sW, Ks))
+                        Kp      <- Kss - crossprod(v)
                         nn      <- nrow(Xs)
                         i1      <- 1:n
                         i2      <- (n+1):nn
@@ -576,8 +580,8 @@ GPCLA <- R6::R6Class(
                         Xs      <- rbind(X1, X0)
                         Ks      <- self$covfun$cov(Xs, self$X)
                         Kss     <- self$covfun$cov(Xs)
-                        v       <- solve(self$L, self$sW %*% t(Ks))
-                        Kp      <- Kss - t(v) %*% v
+                        v       <- solve(self$L, tcrossprod(self$sW, Ks))
+                        Kp      <- Kss - crossprod(v)
                         ## And the posterior mean
                         fs      <- Ks %*% self$alpha + self$meanfun$mean(Xs)
                         ## And then we can get the mean & cov of the diff
@@ -602,9 +606,11 @@ GPCLA <- R6::R6Class(
                         md  <- self$meanfun$input_derivative(self$X,
                                                              dimension = i)
                         Kd  <- self$covfun$input_derivative(self$X,
-                                                            dimension = i)
+                                                            dimension = i,
+                                                            K = K)
                         Kdd <- self$covfun$input_derivative(self$X,
                                                             dimension = i,
+                                                            K = K,
                                                             order = 2)
                         ## Draw f values
                         fhat <- self$post_mean
@@ -613,7 +619,7 @@ GPCLA <- R6::R6Class(
                         ## Draw f_d values conditional on f values
                         fd <- matrix(NA_real_, nrow = M, ncol = n)
                         v  <- solve(LK, t(Kd))
-                        Cd <- Kdd - t(v) %*% v
+                        Cd <- Kdd - crossprod(v)
                         for ( iter in 1:M ) {
                             tmp <- self$L %//% (f[iter, ] - self$prior_mean)
                             mi <- md + Kd %*% tmp
@@ -639,14 +645,14 @@ GPCLA <- R6::R6Class(
                         Ks      <- self$covfun$cov(X1, self$X)
                         fs      <- Ks %*% self$alpha + self$meanfun$mean(X1)
                         Kss     <- self$covfun$cov(X1)
-                        v       <- solve(self$L, self$sW %*% t(Ks))
-                        Kp      <- Kss - t(v) %*% v
+                        v       <- solve(self$L, tcrossprod(self$sW, Ks))
+                        Kp      <- Kss - crossprod(v)
                         f1      <- mvtnorm::rmvnorm(M, mean = fs, sigma = Kp)
                         Ks      <- self$covfun$cov(X0, self$X)
                         fs      <- Ks %*% self$alpha + self$meanfun$mean(X0)
                         Kss     <- self$covfun$cov(X0)
-                        v       <- solve(self$L, self$sW %*% t(Ks))
-                        Kp      <- Kss - t(v) %*% v
+                        v       <- solve(self$L, tcrossprod(self$sW, Ks))
+                        Kp      <- Kss - crossprod(v)
                         f0      <- mvtnorm::rmvnorm(M, mean = fs, sigma = Kp)
                         ## Now push through the sigmoid & store the difference
                         draws   <- plogis(f1) - plogis(f0)
@@ -679,14 +685,14 @@ GPCLA <- R6::R6Class(
                         Ks      <- self$covfun$cov(X1, self$X)
                         fs      <- Ks %*% self$alpha + self$meanfun$mean(X1)
                         Kss     <- self$covfun$cov(X1)
-                        v       <- solve(self$L, self$sW %*% t(Ks))
-                        Kp      <- Kss - t(v) %*% v
+                        v       <- solve(self$L, tcrossprod(self$sW, Ks))
+                        Kp      <- Kss - crossprod(v)
                         f1      <- mvtnorm::rmvnorm(M, mean = fs, sigma = Kp)
                         Ks      <- self$covfun$cov(X0, self$X)
                         fs      <- Ks %*% self$alpha + self$meanfun$mean(X0)
                         Kss     <- self$covfun$cov(X0)
-                        v       <- solve(self$L, self$sW %*% t(Ks))
-                        Kp      <- Kss - t(v) %*% v
+                        v       <- solve(self$L, tcrossprod(self$sW, Ks))
+                        Kp      <- Kss - crossprod(v)
                         f0      <- mvtnorm::rmvnorm(M, mean = fs, sigma = Kp)
                         ## Now push through the sigmoid & store the difference
                         draws   <- plogis(f1) - plogis(f0)

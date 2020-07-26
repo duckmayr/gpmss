@@ -113,7 +113,7 @@ member is used.}
 Compute partial derivatives of covariance function with respect to
 its hyperparameters
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CovSEard$parameter_derivative(X, Z = X, hypers = NULL, param = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CovSEard$parameter_derivative(X, Z = X, hypers = NULL, param = 1, K = NULL)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -134,6 +134,11 @@ If 1 (the default), the derivative is taken with respect to the
 (log of the) scale factor; if 2 or more, it is taken with
 respect to the param - 1 element of the
 (log of the) length scale.}
+
+\item{\code{K}}{An optional provision of the pre-computed kernel;
+this is useful if parameter_derivative() will be called
+repeatedly (for the different hypers) without the kernel
+itself changing}
 }
 \if{html}{\out{</div>}}
 }
@@ -145,7 +150,14 @@ respect to the param - 1 element of the
 Compute partial derivatives of covariance function with respect to
 its inputs
 \subsection{Usage}{
-\if{html}{\out{<div class="r">}}\preformatted{CovSEard$input_derivative(X, Z = X, hypers = NULL, dimension = 1, order = 1)}\if{html}{\out{</div>}}
+\if{html}{\out{<div class="r">}}\preformatted{CovSEard$input_derivative(
+  X,
+  Z = X,
+  hypers = NULL,
+  dimension = 1,
+  order = 1,
+  K = NULL
+)}\if{html}{\out{</div>}}
 }
 
 \subsection{Arguments}{
@@ -167,6 +179,11 @@ default is 1}
 \item{\code{order}}{An integer vector of length one indicating whether the
 first partial derivative (order = 1) is desired, or the cross
 partial (order = 2); the default is 1}
+
+\item{\code{K}}{An optional provision of the pre-computed kernel;
+this is useful if parameter_derivative() will be called
+repeatedly (for the different hypers) without the kernel
+itself changing}
 }
 \if{html}{\out{</div>}}
 }
