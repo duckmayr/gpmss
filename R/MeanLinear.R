@@ -64,7 +64,7 @@ MeanLinear <- R6::R6Class(
                 alpha <- 0
                 beta  <- hypers
             }
-            return(alpha + X %*% beta)
+            return(c(alpha + X %*% beta))
         },
         #' @description
         #' Compute partial derivatives of mean function with respect to
