@@ -637,9 +637,9 @@ GPCLA <- R6::R6Class(
                         } else {
                             vals <- sort(unique(x))
                         }
-                        X1      <- X
+                        X1      <- self$X
                         X1[,d]  <- vals[2]
-                        X0      <- X
+                        X0      <- self$X
                         X0[,d]  <- vals[1]
                         ## Now take M draws from the f posterior given X1 & X0
                         Ks      <- self$covfun$cov(X1, self$X)

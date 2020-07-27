@@ -73,12 +73,11 @@ CovSEiso <- R6::R6Class(
             n <- nrow(X)
             m <- nrow(Z)
             s <- exp(2 * hypers[1])
-            M <- diag(1 / exp(2 * hypers[2]), nrow = ncol(X))
+            l <- 1 / exp(2 * hypers[2])
             K <- matrix(NA_real_, nrow = n, ncol = m)
             for ( j in 1:m ) {
                 for ( i in 1:n ) {
-                    d <- X[i, ] - Z[j, ]
-                    K[i, j] <- s * exp(-0.5 * t(d) %*% M %*% d)
+                    K[i, j] <- s * exp(-0.5 * l * sum((X[i, ] - Z[j, ])^2))
                 }
             }
             return(K)
