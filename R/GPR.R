@@ -252,10 +252,10 @@ GPR <- R6::R6Class(
             v <- solve(L, K)
             V <- K - crossprod(v)
             self$L <- L
-            self$alpha <- a
-            self$post_mean <- m + K %*% a
+            self$alpha <- c(a)
+            self$post_mean <- c(m + K %*% a)
             self$post_cov  <- V
-            self$prior_mean <- m
+            self$prior_mean <- c(m)
         },
         #' @description
         #' Characterize the posterior predictive distribution of the function
@@ -268,7 +268,7 @@ GPR <- R6::R6Class(
             Xstar <- construct_Xstar(self, newdata)
             Kss   <- self$covfun$cov(Xstar)
             Ks    <- self$covfun$cov(Xstar, X)
-            fmean <- self$meanfun$mean(Xstar) + Ks %*% self$alpha
+            fmean <- c(self$meanfun$mean(Xstar) + Ks %*% self$alpha)
             fcov  <- solve(self$L, t(Ks))
             fcov  <- Kss - crossprod(fcov)
             sy2   <- exp(2 * self$likfun$hypers[1])

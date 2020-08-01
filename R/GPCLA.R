@@ -320,7 +320,7 @@ GPCLA <- R6::R6Class(
             Xstar <- construct_Xstar(self, newdata)
             Kss   <- self$covfun$cov(Xstar)
             Ks    <- self$covfun$cov(Xstar, X)
-            fmean <- self$meanfun$mean(Xstar) + Ks %*% self$alpha
+            fmean <- c(self$meanfun$mean(Xstar) + Ks %*% self$alpha)
             fcov  <- solve(self$L, tcrossprod(self$sW, Ks))
             fcov  <- Kss - crossprod(fcov)
             return(
@@ -338,7 +338,7 @@ GPCLA <- R6::R6Class(
             kern <- crossprod(fhat - self$prior_mean, self$alpha)
             ll   <- sum(self$likfun$lp(self$y, fhat)) ## log likelihood
             hldB <- sum(log(diag(self$L)))            ## 1/2 log(det(B))
-            return(0.5 * kern + hldB - ll)
+            return(c(0.5 * kern + hldB - ll))
         },
         #' @description
         #' Caclulate the gradient of the negative log marginal likelihood of

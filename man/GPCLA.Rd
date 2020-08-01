@@ -183,6 +183,7 @@ and "UB", giving the upper bound on the CI.}
 \if{html}{
 \out{<details open ><summary>Inherited methods</summary>}
 \itemize{
+\item \out{<span class="pkg-link" data-pkg="gpmss" data-topic="GPModel" data-id="optimize">}\href{../../gpmss/html/GPModel.html#method-optimize}{\code{gpmss::GPModel$optimize()}}\out{</span>}
 }
 \out{</details>}
 }

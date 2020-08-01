@@ -82,7 +82,7 @@ MeanLinear <- R6::R6Class(
             }
             if ( self$intercept ) {
                 if ( param == 1 ) {
-                    return(rep(0, nrow(X)))
+                    return(rep(1, nrow(X)))
                 } else {
                     param <- param - 1
                 }

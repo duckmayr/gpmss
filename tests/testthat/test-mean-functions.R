@@ -27,7 +27,7 @@ test_that("MeanLinear's mean() method works properly", {
     expect_equal(mu1$mean(X, hyp), c(alpha + X %*% beta))
 })
 test_that("MeanLinear's parameter_derivative() method works properly", {
-    expect_equal(mu1$parameter_derivative(X, hyp, 1), rep(0, nrow(X)))
+    expect_equal(mu1$parameter_derivative(X, hyp, 1), rep(1, nrow(X)))
     expect_equal(mu1$parameter_derivative(X, hyp, 2), X[, 1])
     expect_equal(mu2$parameter_derivative(X, beta, 1), X[, 1])
     expect_error(mu1$parameter_derivative(X, hyp, ncol(X)+2))

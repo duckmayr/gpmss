@@ -73,6 +73,10 @@ Users may also define their own GP models that utilize gpmss functions.
 A GPModel subclass should provide a \code{train()} method,
 a \code{predict()} method, a \code{nlml()} method, a \code{dnlml()}
 method, and a \code{margins()} method.
+A subclass may wish to provide a custome \code{optimize()} method for
+optimizing hyperparameters, though the parent class' \code{optimize()}
+method should be general purpose enough to work for any subclass designed
+according to the description provided here.
 It should have data members \code{name}, \code{y}, \code{X},
 \code{meanfun} (to hold an instance of a subclass of \link{MeanFunction}),
 \code{covfun} (to hold an instance of a subclass of \link{CovarianceFunction}),
@@ -191,6 +195,7 @@ and "UB", giving the upper bound on the CI.}
 \item \href{#method-nlml}{\code{GPModel$nlml()}}
 \item \href{#method-dnlml}{\code{GPModel$dnlml()}}
 \item \href{#method-margins}{\code{GPModel$margins()}}
+\item \href{#method-optimize}{\code{GPModel$optimize()}}
 \item \href{#method-clone}{\code{GPModel$clone()}}
 }
 }
@@ -425,6 +430,42 @@ Every time the method is called, it stores a dataframe of average
 marginal effects; it calculates the mean and variance of the
 marginal effect of each predictor over all observations, or over
 specified indices of observations if provided.
+}
+
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-optimize"></a>}}
+\if{latex}{\out{\hypertarget{method-optimize}{}}}
+\subsection{Method \code{optimize()}}{
+Set hyperparameters by optimizing the log marginal likelihood
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{GPModel$optimize(
+  method = "CG",
+  line_search = "Rasmussen",
+  step0 = "rasmussen",
+  ...
+)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{method}}{Optimization method; default is "CG"}
+
+\item{\code{line_search}}{Type of line search; default is "Rasmussen"}
+
+\item{\code{step0}}{Line search value for the first step; default is
+"rasmussen"}
+
+\item{\code{...}}{Other arguments passed to \code{\link[mize]{mize}}}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Details}{
+The default settings of this function should result in an
+optimization routine that is very similar to that employed in the
+MATLAB/Octave software GPML. For details on the optimization options,
+see \code{\link[mize]{mize}}
 }
 
 }

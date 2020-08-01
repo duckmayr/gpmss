@@ -71,6 +71,10 @@
 #' A GPModel subclass should provide a \code{train()} method,
 #' a \code{predict()} method, a \code{nlml()} method, a \code{dnlml()}
 #' method, and a \code{margins()} method.
+#' A subclass may wish to provide a custome \code{optimize()} method for
+#' optimizing hyperparameters, though the parent class' \code{optimize()}
+#' method should be general purpose enough to work for any subclass designed
+#' according to the description provided here.
 #' It should have data members \code{name}, \code{y}, \code{X},
 #' \code{meanfun} (to hold an instance of a subclass of [MeanFunction]),
 #' \code{covfun} (to hold an instance of a subclass of [CovarianceFunction]),
@@ -383,6 +387,84 @@ GPModel <- R6::R6Class(
                            differences = NULL, indices = NULL, ci = 0.95,
                            force = FALSE, ...) {
             return(NULL)
+        },
+        #' @description
+        #' Set hyperparameters by optimizing the log marginal likelihood
+        #' @details
+        #' The default settings of this function should result in an
+        #' optimization routine that is very similar to that employed in the
+        #' MATLAB/Octave software GPML. For details on the optimization options,
+        #' see \code{\link[mize]{mize}}
+        #' @param method Optimization method; default is "CG"
+        #' @param line_search Type of line search; default is "Rasmussen"
+        #' @param step0 Line search value for the first step; default is
+        #'     "rasmussen"
+        #' @param ... Other arguments passed to \code{\link[mize]{mize}}
+        optimize = function(method = "CG", line_search = "Rasmussen",
+                            step0 = "rasmussen", ...) {
+            funlist <- list(
+                fn = self$nlml,
+                gr = function(par) {
+                    n1 <- length(self$meanfun$hypers)
+                    n2 <- length(self$covfun$hypers)
+                    n3 <- length(self$likfun$hypers)
+                    if ( n1 > 0 ) {
+                        self$meanfun$hypers <- par[1:n1]
+                    }
+                    if ( n2 > 0 ) {
+                        self$covfun$hypers  <- par[(n1+1):(n1+n2)]
+                    }
+                    if ( n3 > 0 ) {
+                        self$likfun$hypers  <- par[(n1+n2+1):(n1+n2+n3)]
+                    }
+                    self$train()
+                    g  <- self$dnlml()
+                    return(c(g$mean, g$cov, g$lik))
+                },
+                fg = function(par) {
+                    n1 <- length(self$meanfun$hypers)
+                    n2 <- length(self$covfun$hypers)
+                    n3 <- length(self$likfun$hypers)
+                    if ( n1 > 0 ) {
+                        self$meanfun$hypers <- par[1:n1]
+                    }
+                    if ( n2 > 0 ) {
+                        self$covfun$hypers  <- par[(n1+1):(n1+n2)]
+                    }
+                    if ( n3 > 0 ) {
+                        self$likfun$hypers  <- par[(n1+n2+1):(n1+n2+n3)]
+                    }
+                    self$train()
+                    g  <- self$dnlml()
+                    return(
+                        list(
+                            fn = self$nlml(),
+                            gr = c(g$mean, g$cov, g$lik)
+                        )
+                    )
+                }
+            )
+            h  <- c(self$meanfun$hypers, self$covfun$hypers, self$likfun$hypers)
+            h  <- mize::mize(h, funlist, method = method, step0 = step0,
+                             line_search = line_search, ...)
+            if ( grepl(pattern = "max", x = h$terminate$what) ) {
+                warning("Convergence was not reached in optimization; ",
+                        "additional calls to optimize() and/or changes to ",
+                        "optimization options may be desirable.")
+            }
+            n1 <- length(self$meanfun$hypers)
+            n2 <- length(self$covfun$hypers)
+            n3 <- length(self$likfun$hypers)
+            if ( n1 > 0 ) {
+                self$meanfun$hypers <- h$par[1:n1]
+            }
+            if ( n2 > 0 ) {
+                self$covfun$hypers  <- h$par[(n1+1):(n1+n2)]
+            }
+            if ( n3 > 0 ) {
+                self$likfun$hypers  <- h$par[(n1+n2+1):(n1+n2+n3)]
+            }
+            invisible(self)
         }
     )
 )
