@@ -70,17 +70,7 @@ CovSEiso <- R6::R6Class(
             if ( length(hypers) != 2 ) {
                 stop("CovSEiso should be called with two hyperparameters.")
             }
-            n <- nrow(X)
-            m <- nrow(Z)
-            s <- exp(2 * hypers[1])
-            l <- 1 / exp(2 * hypers[2])
-            K <- matrix(NA_real_, nrow = n, ncol = m)
-            for ( j in 1:m ) {
-                for ( i in 1:n ) {
-                    K[i, j] <- s * exp(-0.5 * l * sum((X[i, ] - Z[j, ])^2))
-                }
-            }
-            return(K)
+            return(.covSEiso(X, Z, hypers))
         },
         #' @description
         #' Compute partial derivatives of covariance function with respect to

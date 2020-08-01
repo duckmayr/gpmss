@@ -24,4 +24,8 @@ Suggests:
     testthat
 Imports: 
     R6,
-    mize
+    mize,
+    Rcpp
+LinkingTo: 
+    Rcpp,
+    RcppArmadillo

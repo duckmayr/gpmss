@@ -82,22 +82,7 @@ CovSEard <- R6::R6Class(
             if ( length(hypers) != (ncol(X)+1) ) {
                 stop("CovSEard should be called with D+1 hyperparameters.")
             }
-            s <- exp(2 * hypers[1])
-            l <- 1 / exp(2 * hypers[-1])
-            n <- nrow(X)
-            m <- nrow(Z)
-            p <- ncol(X)
-            K <- matrix(NA_real_, nrow = n, ncol = m)
-            for ( j in 1:m ) {
-                for ( i in 1:n ) {
-                    d <- 0
-                    for ( k in 1:p ) {
-                        d <- d + (X[i, k] - Z[j, k])^2 * l[k]
-                    }
-                    K[i, j] <- s * exp(-0.5 * d)
-                }
-            }
-            return(K)
+            return(.covSEard(X, Z, hypers))
         },
         #' @description
         #' Compute partial derivatives of covariance function with respect to
