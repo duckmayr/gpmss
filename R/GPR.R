@@ -237,6 +237,9 @@ GPR <- R6::R6Class(
                                  optimize, force_all_levs)
             }
             self$train()
+            if ( optimize ) {
+                self$optimize()
+            }
         },
         ## Methods
         #' Train the GP model, providing a characterization of the posterior
@@ -246,7 +249,18 @@ GPR <- R6::R6Class(
         train = function(...) {
             K <- self$covfun$cov(self$X)
             s <- exp(2 * self$likfun$hypers[1])
-            L <- t(chol(K + diag(s, length(self$y))))
+            L <- try(t(chol(K + diag(s, length(self$y)))), silent = TRUE)
+            if ( inherits(L, "try-error") ) {
+                ## If we have some numerical stability issues,
+                ## try regularization
+                I <- diag(s + 1e-3, length(self$y))
+                L <- try(t(chol(K + I)), silent = TRUE)
+                if ( inherits(L, "try-error") ) {
+                    ## If we *still* have stability issues,
+                    ## stop with a _slightly_ more informative error
+                    stop("K is not numerically positive definite")
+                }
+            }
             m <- self$meanfun$mean(self$X)
             a <- L %//% (self$y - m)
             v <- solve(L, K)
@@ -256,6 +270,7 @@ GPR <- R6::R6Class(
             self$post_mean <- c(m + K %*% a)
             self$post_cov  <- V
             self$prior_mean <- c(m)
+            invisible(self)
         },
         #' @description
         #' Characterize the posterior predictive distribution of the function
@@ -498,7 +513,7 @@ GPR <- R6::R6Class(
             })
             k <- 1/(length(indices)^2)
             ame_sds <- sapply(self$marginal_effects, function(x) {
-                return( k * sum(x[["covariance"]][indices, indices]) )
+                return( sqrt(k * sum(x[["covariance"]][indices, indices])) )
             })
             self$average_marginal_effects <- data.frame(
                 Variable = names(ames),

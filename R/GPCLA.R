@@ -243,6 +243,9 @@ GPCLA <- R6::R6Class(
                 }
             }
             self$train(...)
+            if ( optimize ) {
+                self$optimize()
+            }
         },
         ## Methods
         #' Train the GP model, providing a characterization of the posterior
@@ -305,6 +308,7 @@ GPCLA <- R6::R6Class(
             v <- solve(self$L, self$sW %*% K)
             self$post_cov  <- K - crossprod(v)
             self$prior_mean <- m
+            invisible(self)
         },
         #' @description
         #' Characterize the posterior predictive distribution of the function
@@ -621,7 +625,7 @@ GPCLA <- R6::R6Class(
                         v  <- solve(LK, t(Kd))
                         Cd <- Kdd - crossprod(v)
                         for ( iter in 1:M ) {
-                            tmp <- self$L %//% (f[iter, ] - self$prior_mean)
+                            tmp <- LK %//% (f[iter, ] - self$prior_mean)
                             mi <- md + Kd %*% tmp
                             fd[iter,] <- t(mvtnorm::rmvnorm(1,mean=mi,sigma=Cd))
                         }
@@ -729,7 +733,7 @@ GPCLA <- R6::R6Class(
                 d <- res$Variable[i]
                 x <- self$marginal_effects[[d]]
                 if ( attr(x, "type") == "link" ) {
-                    this_sd <- k * sum(x[["covariance"]][indices, indices])
+                    this_sd <- sqrt(k*sum(x[["covariance"]][indices, indices]))
                     res$LB[i] <- qnorm(ci_low,  mean = ames[d], sd = this_sd)
                     res$UB[i] <- qnorm(ci_high, mean = ames[d], sd = this_sd)
                 } else {

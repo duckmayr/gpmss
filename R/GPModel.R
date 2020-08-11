@@ -297,9 +297,6 @@ GPModel <- R6::R6Class(
             }
             names(cc) <- names(ff)[ff]
             self$X <- stats::model.matrix(formula, mf, contrasts.arg = cc)
-            if ( optimize ) {
-                warning("Hyper optimization not yet implemented.")
-            }
         },
         ## Methods
         #' Train the GP model, providing a characterization of the posterior
