@@ -30,3 +30,32 @@ construct_Xstar <- function(model, newdata) {
     }
     return(as.matrix(Xstar))
 }
+
+## This function gets the (upper) Cholesky decomposition of a matrix that's
+## PSD by construction, but which may have very small eigenvalues;
+## we try to decomp and if it fails, we try again after regularizing
+safe_chol <- function(M) {
+    R <- try(chol(M), silent = TRUE)
+    if ( inherits(R, "try-error") ) {
+        R <- try(chol(M + diag(1e-6, nrow = nrow(M))), silent = TRUE)
+        if ( inherits(R, "try-error") ) {
+            stop("Cholesky decomp failed; matrix was not numerically PSD.")
+        }
+    }
+    return(R)
+}
+
+## This is a custom multivariate normal generating function;
+## I set this up merely to use the safe_chol() function above
+rmvn <- function(n, mu = rep(0, nrow(Sigma)), Sigma) {
+    m <- ncol(Sigma)
+    R <- safe_chol(Sigma)
+    U <- matrix(stats::rnorm(n*m), nrow = n)
+    res <- U %*% R
+    if ( !all(mu == 0) ) {
+        for ( i in 1:n ) {
+            res[i, ] <- res[i, ] + mu
+        }
+    }
+    return(res)
+}

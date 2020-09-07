@@ -563,7 +563,7 @@ GPCLA <- R6::R6Class(
                              & b0 %in% names(base_categories)
                              & isTRUE(base_categories[[b0]] %in% factors[[b0]])
                              ) {
-                            paste0(b0, base_categories[[b0]])
+                            b <- paste0(b0, base_categories[[b0]])
                         } else {
                             b <- paste0(b0, factors[[b0]][1])
                         }
@@ -619,15 +619,15 @@ GPCLA <- R6::R6Class(
                         ## Draw f values
                         fhat <- self$post_mean
                         fcov <- self$post_cov
-                        f <- mvtnorm::rmvnorm(n = M, mean = fhat, sigma = fcov)
+                        f <- rmvn(n = M, mu = fhat, Sigma = fcov)
                         ## Draw f_d values conditional on f values
                         fd <- matrix(NA_real_, nrow = M, ncol = n)
                         v  <- solve(LK, t(Kd))
                         Cd <- Kdd - crossprod(v)
+                        fd <- rmvn(n = M, Sigma = Cd)
                         for ( iter in 1:M ) {
                             tmp <- LK %//% (f[iter, ] - self$prior_mean)
-                            mi <- md + Kd %*% tmp
-                            fd[iter,] <- t(mvtnorm::rmvnorm(1,mean=mi,sigma=Cd))
+                            fd[iter,] <- fd[iter, ] + md + Kd %*% tmp
                         }
                         ## Get pi_{id} values for each draw
                         ## FIXME: This is hard-coded for now,
@@ -668,7 +668,7 @@ GPCLA <- R6::R6Class(
                              & b0 %in% names(base_categories)
                              & isTRUE(base_categories[[b0]] %in% factors[[b0]])
                         ) {
-                            paste0(b0, base_categories[[b0]])
+                            b <- paste0(b0, base_categories[[b0]])
                         } else {
                             b <- paste0(b0, factors[[b0]][1])
                         }

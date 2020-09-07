@@ -466,7 +466,7 @@ GPR <- R6::R6Class(
                     if ( !is.null(base_categories)
                          & b0 %in% names(base_categories)
                          & isTRUE(base_categories[[b0]] %in% factors[[b0]]) ) {
-                        paste0(b0, base_categories[[b0]])
+                        b <- paste0(b0, base_categories[[b0]])
                     } else {
                         b <- paste0(b0, factors[[b0]][1])
                     }
