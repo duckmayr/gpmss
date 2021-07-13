@@ -290,7 +290,7 @@ GPCLA <- R6::R6Class(
                 W  <- diag(-self$likfun$f_derivative(self$y, f, order = 2))
                 sW <- sqrt(W)                       ## Square root of W
                 M  <- sW %*% K                      ## We reuse sW %*% K
-                L  <- t(chol(I + M %*% sW))         ## LL^T = B = I + sW K sW
+                L  <- t(safe_chol(I + M %*% sW))    ## LL^T = B = I + sW K sW
                 g  <- self$likfun$f_derivative(self$y,f) ## likelihood gradient
                 b  <- W %*% (f-m) + g               ## W (f-m) + g
                 a  <- b - sW %*% (L %//% (M %*% b)) ## Regular Newtown step
@@ -505,11 +505,7 @@ GPCLA <- R6::R6Class(
             K  <- self$covfun$cov(self$X)
             ## If type == "response", we need the lower Cholesky of K
             if ( type == "response" ) {
-                LK <- try(t(chol(K)), silent = TRUE)
-                ## If chol() fails, try regularization
-                if ( inherits(LK, "try-error") ) {
-                    LK <- t(chol(K + diag(1e-3, nrow = n)))
-                }
+                LK <- t(safe_chol(K))
             }
             ## Get effects for each variable
             for ( d in variables ) {

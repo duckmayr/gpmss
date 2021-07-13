@@ -249,18 +249,7 @@ GPR <- R6::R6Class(
         train = function(...) {
             K <- self$covfun$cov(self$X)
             s <- exp(2 * self$likfun$hypers[1])
-            L <- try(t(chol(K + diag(s, length(self$y)))), silent = TRUE)
-            if ( inherits(L, "try-error") ) {
-                ## If we have some numerical stability issues,
-                ## try regularization
-                I <- diag(s + 1e-3, length(self$y))
-                L <- try(t(chol(K + I)), silent = TRUE)
-                if ( inherits(L, "try-error") ) {
-                    ## If we *still* have stability issues,
-                    ## stop with a _slightly_ more informative error
-                    stop("K is not numerically positive definite")
-                }
-            }
+            L <- t(safe_chol(K + diag(s, length(self$y))))
             m <- self$meanfun$mean(self$X)
             a <- L %//% (self$y - m)
             v <- solve(L, K)

@@ -36,11 +36,13 @@ construct_Xstar <- function(model, newdata) {
 ## we try to decomp and if it fails, we try again after regularizing
 safe_chol <- function(M) {
     R <- try(chol(M), silent = TRUE)
+    r <- 1e-6
+    while ( inherits(R, "try-error") & r < 1 ) {
+        R <- try(chol(M + diag(r, nrow = nrow(M))), silent = TRUE)
+        r <- r * 10
+    }
     if ( inherits(R, "try-error") ) {
-        R <- try(chol(M + diag(1e-6, nrow = nrow(M))), silent = TRUE)
-        if ( inherits(R, "try-error") ) {
-            stop("Cholesky decomp failed; matrix was not numerically PSD.")
-        }
+        stop("Cholesky decomp failed; matrix was not numerically PSD.")
     }
     return(R)
 }
