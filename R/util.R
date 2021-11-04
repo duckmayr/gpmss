@@ -23,7 +23,8 @@ construct_Xstar <- function(model, newdata) {
     for ( i in attr(terms(model), "term.labels") ) {
         if ( i %in% names(attr(model$X, "contrasts")) ) {
             cntr <- attr(model$X,"contrasts")[[i]]
-            Xstar[ , paste0(i, rownames(cntr))] <- cntr[newdata[[i]], ]
+            ii <- as.character(newdata[[i]])
+            Xstar[ , paste0(i, rownames(cntr))] <- cntr[ii, ]
         } else {
             Xstar[ , i] <- newdata[[i]]
         }
